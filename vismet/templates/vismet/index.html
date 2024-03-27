@@ -1,0 +1,307 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <title>Instituto de Estudos Climáticos do Espírito Santo</title>
+
+    <link type="text/css" rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link type="text/css" rel="stylesheet" href="{% static 'vismet/css/main.css' %}">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+
+    <!-- Sidebar -->
+    <div class="w3-sidebar w3-bar-block w3-border-right" style="display:none" id="mySidebar">
+      <button onclick="w3_close()" class="w3-bar-item w3-button">Fechar</button>
+      <div class="w3-dropdown-hover">
+        <div class=" w3-bar-block">
+          <button onclick="w3_close()" id="btn-observados" value="observados" class="w3-bar-item w3-button">Dados Observacionais</button>
+          <button onclick="w3_close()" id="btn-reanálise" value="reanálise" class="w3-bar-item w3-button">Dados de Reanálise</button>
+          <button onclick="w3_close()" id="btn-simulados" value="simulados" class="w3-bar-item w3-button">Projeções de Cenários Futuros</button>
+        </div>
+      </div>
+    <!--<a href="#" class="w3-bar-item w3-button">Sobre</a>-->
+    </div>
+
+    <div class="main container-fluid">
+      <div class="row conteudo">
+        <div class="col-md-3" id="sidebar">
+          <button id="linkplataforma" class="w3-button w3-white w3-xlarge" onclick="w3_open()">☰</button>
+          <h1><a href="{% url 'home:index' %}">IEC-ES</a></h1>
+          <div class="help-tip">
+              <p>Para utilizar a plataforma, selecione:<br>1. Fonte<br>2. Selecione no mapa a fonte ou pixel<br>3. Dado diário ou mensal<br>4. Variável<br>5. Datas inicial e final<br>6. Clique em "Visualizar" ou "Baixar"</p>
+          </div>
+          <div class="data-container" id="div-observados">
+            <div class="data-text small-font">
+              <h3>Dados Observacionais:</h3>
+              <p>Nesta categoria podem ser obtidos conjuntos de dados diários observados, para o estado do Espírito Santo, a partir da rede de estações convencionais e automáticas de instituições nacionais, tais como: temperatura, precipitação, vazão, evapotranspiração, radiação solar, vento e umidade relativa do ar. Estão disponibilizados nesta base de dados:</p>
+              <ul>
+                <li>INMET: Dados da Rede de Estações Meteorológicas Automáticas do INMET desde 2000 até a presente data e dados da Rede de Estações Meteorológicas Convencionais do INMET desde 1924 até a presente data.</li>
+                <li>ANA: Dados de Pluviômetros e Fluviométricos da ANA desde 1925 até 2019.</li>
+              </ul>
+            </div>
+            <div class="data-text padded-data-text selectdiv">
+                <div>
+                <label for="fonte-dados-observados">Fonte</label><br>
+                <select class="sel-data-source" name="fonte-dados-observados">
+                </select><br>
+            </div>
+              <form action="javascript:void(0);" method="get">
+                {% csrf_token %}
+
+                <div>
+                  <br>
+                  <!--<input type="radio" name="type" class="frequency" value="0">
+                  <label for="1">Dado mensal</option>-->
+                  <input type="radio" name="type" class="frequency" value="1">
+                  <label for="0">Dado diário</option><br>
+                </div>
+                <label for="variable">Variável</label><br>
+                <select class="sel-data-variable" name="variable"></select><br>
+                <br><label for="scale">Valor mínimo do gráfico</label><br>
+                <input class="sel-chart-min-value" type="number" min=0, step=0.1, value=0>
+                <label for="scale">Valor máximo do gráfico</label>
+                <br>
+                <input class="sel-chart-max-value" type="number" min=0, step=1, value=50>
+              </form><br>
+            </div>
+            <input type="hidden" value="0" id="input_station_code">
+          </div>
+
+          <div class="data-container" id="div-reanálise">
+            <div class="data-text small-font">
+            <h3>Dados de Reanálise:</h3>
+              <!-- <div class="alert">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>Os dados de reanálise estão sendo adaptados para a plataforma e serão disponibilizados em breve.</strong>
+              </div> -->
+              <p id="texto-reanalise">As reanálises são um conjunto de dados de clima que combinam informações a partir de observações de estações meteorológicas, modelagem, imagens de satélites e utilizam análises estatísticas na reconstrução da base de dados.</p>
+              <ul>
+                <li>CHIRPS: dados disponibilizados pela University of California desde 1981 até a presente data, com Resolução Espacial: 0.05°.</li>
+                <li>ERA5: Os dados estão disponíveis em grades regulares de latitude-longitude com resolução espacial de 0.25°, com resolução temporal de 1979 até a presente data.</li>
+              </ul>
+            </div>
+            <div class="data-text padded-data-text selectdiv">
+              <label for="fonte-dados-reanalise">Fonte</label><br>
+              <select class="sel-data-source" name="fonte-dados-reanalise"></select>
+              <form action="javascript:void(0);" method="get">
+                {% csrf_token %}
+                <div>
+                  <br>
+                  <input type="radio" name="type" id="reanal" class="frequency" value="0">
+                  <label for="0">Dado mensal</option>
+                  <input disabled type="radio" name="type" class="frequency" value="1">
+                  <label for="1" style="color: grey;">Dado diário</option><br>
+                </div>
+                <br><label for="variable">Variável</label><br>
+                <select class="sel-data-variable" name="variable">
+                </select>
+                <div></div>
+                <br><label for="scale">Valor mínimo do gráfico</label><br>
+                <input class="sel-chart-min-value" type="number" min=0, step=0.1, value=0>
+                <br><label for="scale">Valor máximo do gráfico</label><br>
+                <input class="sel-chart-max-value" type="number" min=0, value=50>
+              </form>
+            </div>
+          </div>
+
+          <div class="data-container" id="div-simulados">
+            <div class="data-text small-font">
+              <h3 id="header-cenarios">Projeção de Cenários Futuros:</h3>
+              <p>Os dados estão divididos em três conjuntos principais: Período histórico (1960-2005), e dois cenários de emissões de gases de efeito estufa (GEE), o cenário RCP 4.5 (médias emissões de GEE) e o cenário RCP 8.5 (altas emissões de GEE) desde 2006 até 2099. Todos os dados podem ser obtidos por pixel (coordenada geográfica) ou integrado para cada município do estado.</p>
+            </div>
+            <div class="data-text padded-data-text selectdiv">
+              <br><label for="fonte-dados-simulados">Fonte</label><br>
+              <select class="sel-data-source" name="fonte-dados-simulados"></select>
+              <div id="divmodelo">
+                <br><label for="sel-data-model">Cenário Climático</label><br>
+              </div>
+              <select class="sel-data-model" name="sel-data-model"></select><br>
+              <form action="javascript:void(0);" method="get">
+                {% csrf_token %}
+                <div>
+                  <br>
+                  <input type="radio" name="type" id="simulal" class="frequency" value="0">
+                  <label for="0">Dado mensal</option>
+                  <input disabled type="radio" name="type" class="frequency" value="1">
+                  <label for="1" style="color: grey;">Dado diário</option><br>
+                </div>
+                <br><label for="variable">Variável</label><br>
+                <select class="sel-data-variable" name="variable">
+                </select>
+                <br><label for="scale">Valor mínimo do gráfico</label><br>
+                <input class="sel-chart-min-value" type="number" min=0, step=0.1, value=0>
+                <br><label for="scale">Valor máximo do gráfico</label><br>
+                <input class="sel-chart-max-value" type="number" min=0, step=0.1, value=50>
+              </form>
+            </div> 
+            <input type="hidden" value="0" id="input_city_name">
+          </div>
+          
+          <div class="data-container" id="data-container">
+            <div id="dateselect">
+              <div id="dateinput" style='display:none;' class="data-text padded-data-text day">
+                <label for="startDate">Data inicial</label>
+                <input class="dateinput startDate" type="text" id="startDate" name="startDate" autocomplete="off"><br>
+                <div id="datafinal">
+                  <label for="finalDate">Data final</label><br>
+                  <input class="dateinput finalDate" type="text" id="finalDate" name="finalDate" autocomplete="off">
+                </div>
+              </div>
+              <div style='display:none;' class="data-text padded-data-text month">
+                <div style="display: inline-block;">
+                  <p>Mês inicial:</p>
+                  <select name="start_Month" id="startMonth">
+                    <option value="01">Janeiro</option>
+                    <option value="02">Fevereiro</option>
+                    <option value="03">Março</option>
+                    <option value="04">Abril</option>
+                    <option value="05">Maio</option>
+                    <option value="06">Junho</option>
+                    <option value="07">Julho</option>
+                    <option value="08">Agosto</option>
+                    <option value="09">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                </select>
+                <select name="start_Year" id="startYear">
+                </select>
+                </div>
+                <div style="display: inline-block;">
+                 <br> <p>Mês final:</p>
+                 <select name="final_Month" id="finalMonth">
+                  <option value="01">Janeiro</option>
+                  <option value="02">Fevereiro</option>
+                  <option value="03">Março</option>
+                  <option value="04">Abril</option>
+                  <option value="05">Maio</option>
+                  <option value="06">Junho</option>
+                  <option value="07">Julho</option>
+                  <option value="08">Agosto</option>
+                  <option value="09">Setembro</option>
+                  <option value="10">Outubro</option>
+                  <option value="11">Novembro</option>
+                  <option value="12">Dezembro</option>
+              </select>
+              <select name="final_Year" id="finalYear">
+                <option value="" disabled>Ano</option>
+              </select>
+                </div>
+              </div>
+            </div>
+
+            <div id="stationdata" class="data-text padded-data-text selectdiv" style="display: none;">
+              <p>Data inicial da estação selecionada: <div id="stationn_startDate"></div></p>
+              <p>Data final da estação selecionada:</p>
+              <div id="stationn_finalDate"></div>
+            </div>
+
+            <div id="div-buttons">
+              <button type="button" class="gbutton" id="btn_submit">Visualizar</button>
+              <button type="button" class="gbutton" id="btn_download" name="btn_download">Baixar</button>
+              <!--<a style="display:none;" type="button" class="gbutton" id="chart_download" download="Grafico.jpg">Baixar Gráfico</a>-->
+              <button id="chartdownload" style="display: none;" onclick="screenshot()">Salvar Gráfico</button>
+              <input type="hidden" id="selected_source" value="{{ selected_source }}">
+            </div>
+          </div>
+        </div>
+        <div class="row col-md-9">
+          <div id="map"></div>
+        </div>
+      </div>
+      
+      {% if use_production_api == True %}
+        <input type="hidden" id="url-cities" value="https://iec.ufes.br/plataforma/api/cities/">
+        <input type="hidden" id="url-pixels" value="https://iec.ufes.br/plataforma/api/pixels/">
+        <input type="hidden" id="url-pixels-025" value="https://iec.ufes.br/plataforma/api/pixels025/">
+        <input type="hidden" id="url-pixels-01" value="https://iec.ufes.br/plataforma/api/pixels01/">
+        <input type="hidden" id="url-stations" value="https://iec.ufes.br/plataforma/api/estacoes/">
+        <input type="hidden" id="url-data-options" value="https://iec.ufes.br/plataforma/api/opcoes/">
+        <input type="hidden" id="url-api" value="https://iec.ufes.br/plataforma/api/pixeldata/">
+      {% else %}
+        <input type="hidden" id="url-cities" value="{% url 'vismet:cities' %}"> 
+        <input type="hidden" id="url-pixels" value="{% url 'vismet:pixels' %}">
+        <input type="hidden" id="url-pixels-025" value="{% url 'vismet:pixels-025' %}">
+        <input type="hidden" id="url-pixels-01" value="{% url 'vismet:pixels-01' %}">
+        <input type="hidden" id="url-stations" value="{% url 'vismet:api_stations' %}">
+        <input type="hidden" id="url-data-options" value="{% url 'vismet:data_options' %}">
+        <input type="hidden" id="url-api" value="{% url 'vismet:pixel-data-list' %}">
+      {% endif %}
+    </div>
+    <div id="chartdiv" class="chart-container">
+      <canvas id="chart"></canvas>
+    </div>
+
+    <!-- CDNs das bibliotecas -->
+    <!-- jQuery 3.5.1 -->
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous">
+    </script>
+
+    <!-- Sidebar -->
+    <script>
+      function w3_open() {
+          document.getElementById("mySidebar").style.display = "block";
+      }
+      function w3_close() {
+          document.getElementById("mySidebar").style.display = "none";
+      }
+    </script>
+
+    <!-- Popper -->
+    <script type="text/javascript" src="https://unpkg.com/@popperjs/core@2"></script>
+
+    <!-- html2canvas -->
+    <script type="text/javascript" src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <!-- Bootstrap 4 -->
+    <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+
+    <!-- ChartJs -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+    <!-- jQuery UI 1.12 -->
+    <script
+			  src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+			  integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
+			  crossorigin="anonymous">
+    </script>
+
+    <!-- Leaflet 1.7 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""></script>
+
+    <!-- JS próprios da plataforma  -->
+    <script type="text/javascript" src="{% static 'vismet/js/init-vars.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/chart.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/map.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/xavier.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/inmet.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/ana.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/cities.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/pixels.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/pixels025.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/pixels01.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/chirps.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/layers.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/botoes.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/init.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vismet/js/validadata.js' %}"></script>
+
+  </body>
+</html>
